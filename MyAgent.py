@@ -1,6 +1,4 @@
-
 from Game2048 import *
-import random
 import math
 
 class Player(BasePlayer):
@@ -14,7 +12,7 @@ class Player(BasePlayer):
             sim, _ = board.result(m)
             score = self.eval(sim)
             moveScores[m] = score
-        
+
         best = None
         highest = float('-inf')
         for m in moveScores:
@@ -25,39 +23,32 @@ class Player(BasePlayer):
         self.setMove(best)
 
     def eval(self, b):
-        # count empty spots
-        empties = 0
-        for i in b._board:
-            if i == 0:
-                empties += 1
+        #for empty spots
+        empties = sum(1 for i in b._board if i == 0)
 
         maxVal = max(b._board)
 
-        # smoothness measure (just rough diff)
         smooth = 0
         for i in range(4):
             for j in range(3):
-                smooth -= abs(b.getTile(i,j) - b.getTile(i,j+1))
+                smooth -= abs(b.getTile(i, j) - b.getTile(i, j + 1))
         for j in range(4):
             for i in range(3):
-                smooth -= abs(b.getTile(i,j) - b.getTile(i+1,j))
+                smooth -= abs(b.getTile(i, j) - b.getTile(i + 1, j))
 
-        # try to keep highest in a corner
-        corners = [b.getTile(0,0), b.getTile(0,3), b.getTile(3,0), b.getTile(3,3)]
-        cornerBonus = 0
-        if maxVal in corners:
-            cornerBonus = 1
+        #corner for max tile 
+        corners = [b.getTile(0, 0), b.getTile(0, 3), b.getTile(3, 0), b.getTile(3, 3)]
+        cornerBonus = 1 if maxVal in corners else 0
 
-        # simple directional flow bonus (monotonicity-ish)
-        rowMono = 0
-        colMono = 0
-        for r in range(4):
-            for c in range(3):
-                if b.getTile(r,c) > b.getTile(r,c+1):
-                    rowMono += 1
-        for c in range(4):
-            for r in range(3):
-                if b.getTile(r,c) > b.getTile(r+1,c):
-                    colMono += 1
+        #direction
+        rowMono = sum(1 for r in range(4) for c in range(3) if b.getTile(r, c) > b.getTile(r, c + 1))
+        colMono = sum(1 for c in range(4) for r in range(3) if b.getTile(r, c) > b.getTile(r + 1, c))
 
-        return 85 * empties + smooth + maxVal + (rowMono + colMono)*2 + cornerBonus * 1500
+        #new weights
+        return (
+            100 * empties +            
+            1.8 * smooth +             
+            0.5 * maxVal +             
+            3.0 * (rowMono + colMono) + 
+            2000 * cornerBonus         
+        )
