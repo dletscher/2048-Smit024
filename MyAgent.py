@@ -1,4 +1,3 @@
-
 from Game2048 import *
 import math
 
@@ -7,7 +6,7 @@ class Player(BasePlayer):
         BasePlayer.__init__(self, timeLimit)
         self.maxDepth = 3
 
-    #for best move
+    # For best move
     def findMove(self, board):
         bestMove = None
         bestScore = float('-inf')
@@ -27,7 +26,7 @@ class Player(BasePlayer):
 
         self.setMove(bestMove)
 
-    #expectimax logic
+    # Expectimax logic
     def expectimax(self, board, depth, isMax):
         if depth == 0 or board.gameOver():
             return self.eval(board)
@@ -58,11 +57,13 @@ class Player(BasePlayer):
         empties = tiles.count(0)
         maxVal = max(tiles)
 
-        #weight logic 
-        grad = [65536, 32768, 16384, 8192,
-                512, 1024, 2048, 4096,
-                256, 128, 64, 32,
-                2, 4, 8, 16]
+        #weight logic
+        grad = [
+            65536, 32768, 16384, 8192,
+            512, 1024, 2048, 4096,
+            256, 128, 64, 32,
+            2, 4, 8, 16
+        ]
         gradScore = sum(tiles[i] * grad[i] for i in range(16))
 
         #Smoothnes
@@ -89,7 +90,7 @@ class Player(BasePlayer):
                 if b.getTile(r, c) >= b.getTile(r + 1, c):
                     mono += 1
 
-        #center tiles 
+        #Center tiles
         centerPenalty = -0.3 * sum(b.getTile(r, c) for r in (1, 2) for c in (1, 2))
 
         return (
