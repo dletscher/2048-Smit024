@@ -89,12 +89,12 @@ class Player(BasePlayer):
                     mono += 1
 
         #center tiles 
-        centerPenalty = -0.3 * sum(b.getTile(r, c) for r in (1, 2) for c in (1, 2))
+        centerPenalty = -0.45 * sum(b.getTile(r, c) for r in (1, 2) for c in (1, 2))
 
         return (
-            150 * empties +
-            1.2 * smooth +
-            4.0 * mono +
-            0.01 * gradScore +
+            210 * empties +
+            2.8 * smooth +
+            6.5 * mono +
+            0.025 * gradScore +
             centerPenalty
         )
